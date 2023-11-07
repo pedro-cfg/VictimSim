@@ -6,37 +6,55 @@ from node import Node
 
 class RescueRoute:
 
+    graph_map = {}
+
     def __init__(self):
         self.victim_sequence = []
         self.distance = -1
         self.victims = []
+        self.fitness = 0
 
-    def fitness(self):
-        pass
+    def calculate_fitness(self):
+        return 1 /(1 + self.distance) 
     
-    def init_route(self, victims, graph_map):
+    def get_fitness(self):
+        return self.fitness
+    
+    def set_fitness(self, fit):
+        self.fitness = fit
+    
+    def init_route(self, victims):
         self.victims = victims
         order = list(range(len(victims)))
         random.shuffle(order)
         self.victim_sequence = order
 
-        self.total_distance(graph_map)
+        self.distance = self.total_distance()
 
-    def total_distance(self, graph_map):
+    def total_distance(self):
         
         distance = 0
 
-        result = self.astar(graph_map, (0,0), self.victims[self.victim_sequence[0]][0])
+        result = self.astar(RescueRoute.graph_map, (0,0), self.victims[self.victim_sequence[0]][0])
         distance += self.calculate_cost(result)
 
         for i in range(len(self.victim_sequence) - 1):
-            distance += self.distance_between_victims(self.victim_sequence[i], self.victim_sequence[i + 1], graph_map)
+            distance += self.distance_between_victims(self.victim_sequence[i], self.victim_sequence[i + 1], RescueRoute.graph_map)
 
-        result = self.astar(graph_map, self.victims[self.victim_sequence[len(self.victim_sequence) - 1]][0], (0,0))
+        result = self.astar(RescueRoute.graph_map, self.victims[self.victim_sequence[len(self.victim_sequence) - 1]][0], (0,0))
         distance += self.calculate_cost(result)
 
         return distance
-            
+    
+    def mutate(self):
+        index1 = random.randint(0, len(self.victim_sequence) - 1)
+        index2 = random.randint(0, len(self.victim_sequence) - 1)
+
+        aux = self.victim_sequence[index1]
+        self.victim_sequence[index1] = self.victim_sequence[index2]
+        self.victim_sequence[index2] = aux
+
+        self.distance = self.total_distance()
 
     def distance_between_victims(self, v1, v2, graph_map):
 

@@ -1,4 +1,5 @@
 import math
+import random
 from rescue_route import RescueRoute
 
 class Genetic:
@@ -8,6 +9,7 @@ class Genetic:
     def __init__(self, map):
         self.map = map
         Genetic.create_graph(self.map)
+        RescueRoute.graph_map = Genetic.graph_map
         
 
     @staticmethod
@@ -59,7 +61,34 @@ class Genetic:
 
         for i in range(number):
             individual = RescueRoute()
-            individual.init_route(victims, Genetic.graph_map)
+            individual.init_route(victims)
             population.append(individual)
+        
+        sum = 0
+
+        for individual in population:
+            sum += individual.calculate_fitness()
+
+        for individual in population:
+            individual.set_fitness(individual.calculate_fitness()/sum)
+
+        for individual in population:
+            selected = self.roulette(population)
+            selected.mutate()
+
 
         breakzin = 1
+
+    def roulette(self, population):
+        
+        population = sorted(population, key=lambda individual: individual.get_fitness())
+
+        i = 1
+        sum = population[i].get_fitness()
+        r = random.uniform(0, 1)
+
+        while(sum < r):
+            i = i + 1
+            sum += population[i].get_fitness()
+
+        return population[i]

@@ -23,9 +23,14 @@ def main(data_folder_name):
     rescuer_file = os.path.join(data_folder, "rescuer_config.txt")
     explorer_file = os.path.join(data_folder, "explorer_config.txt")
     
-    # Instantiate agents rescuer and explorer
-    resc = Rescuer(env, rescuer_file, [])
+    resc_list = []
 
+    # Instantiate agents rescuer and explorer
+    resc1 = Rescuer(env, rescuer_file, [])
+    resc_list.append(resc1)
+    resc2 = Rescuer(env, rescuer_file, resc_list.copy())
+    
+    resc_list.append(resc2)
     # Explorer needs to know rescuer to send the map
     # that's why rescuer is instatiated before
     # lista = ['E', 'N', 'NW', 'SW', 'NE', 'SE', 'W', 'S']
@@ -33,10 +38,10 @@ def main(data_folder_name):
     # exp = Explorer(env, explorer_file, [resc], random.sample(lista, len(lista)))
     # exp = Explorer(env, explorer_file, [resc], random.sample(lista, len(lista)))
     # exp = Explorer(env, explorer_file, [resc], random.sample(lista, len(lista)))
-    exp = Explorer(env, explorer_file, [resc], ['E', 'N', 'S', 'W', 'NE', 'NW', 'SW', 'SE'])
-    exp = Explorer(env, explorer_file, [resc], ['N', 'W', 'E', 'S', 'NW', 'NE', 'SE', 'SW'])
-    exp = Explorer(env, explorer_file, [resc], ['W', 'S', 'N', 'E', 'SW', 'SE', 'NE', 'NW'])
-    exp = Explorer(env, explorer_file, [resc], ['S', 'E', 'W', 'N', 'SE', 'NE', 'NW', 'SW'])
+    exp = Explorer(env, explorer_file, resc_list, ['E', 'N', 'S', 'W', 'NE', 'NW', 'SW', 'SE'])
+    exp = Explorer(env, explorer_file, resc_list, ['N', 'W', 'E', 'S', 'NW', 'NE', 'SE', 'SW'])
+    exp = Explorer(env, explorer_file, resc_list, ['W', 'S', 'N', 'E', 'SW', 'SE', 'NE', 'NW'])
+    exp = Explorer(env, explorer_file, resc_list, ['S', 'E', 'W', 'N', 'SE', 'NE', 'NW', 'SW'])
 
     # Run the environment simulator
     env.run()
