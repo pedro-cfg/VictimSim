@@ -8,6 +8,7 @@ class Genetic:
 
     def __init__(self, map):
         self.map = map
+        self.population = []
         Genetic.create_graph(self.map)
         RescueRoute.graph_map = Genetic.graph_map
         
@@ -50,30 +51,30 @@ class Genetic:
         if (coord1[0] - 1, coord1[1] + 1) == coord2:
             return 1.5
         return None
+    
+    def verify_possible_routes(self):
+        pass
 
     def find_route(self, victims):
         self.init_route_population(10, victims)
 
-
     def init_route_population(self, number, victims):
-
-        population = []
 
         for i in range(number):
             individual = RescueRoute()
             individual.init_route(victims)
-            population.append(individual)
+            self.population.append(individual)
         
         sum = 0
 
-        for individual in population:
+        for individual in self.population:
             sum += individual.calculate_fitness()
 
-        for individual in population:
+        for individual in self.population:
             individual.set_fitness(individual.calculate_fitness()/sum)
 
-        for individual in population:
-            selected = self.roulette(population)
+        for individual in self.population:
+            selected = self.roulette(self.population)
             selected.mutate()
 
 
