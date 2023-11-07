@@ -24,7 +24,7 @@ def main(data_folder_name):
     explorer_file = os.path.join(data_folder, "explorer_config.txt")
     
     # Instantiate agents rescuer and explorer
-    resc = Rescuer(env, rescuer_file)
+    resc = Rescuer(env, rescuer_file, [])
 
     # Explorer needs to know rescuer to send the map
     # that's why rescuer is instatiated before
@@ -49,6 +49,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         data_folder_name = sys.argv[1]
     else:
-        data_folder_name = os.path.join("datasets", "data_teste_sala")
+        data_folder_name = os.path.join("datasets", "data_20x20_42vic")
         
     main(data_folder_name)

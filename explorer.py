@@ -14,7 +14,7 @@ from node import Node
 import time
 
 class Explorer(AbstractAgent):
-    def __init__(self, env, config_file, resc, path_priorities):
+    def __init__(self, env, config_file, rescuers, path_priorities):
         """ Construtor do agente random on-line
         @param env referencia o ambiente
         @config_file: the absolute path to the explorer's config file
@@ -24,7 +24,7 @@ class Explorer(AbstractAgent):
         super().__init__(env, config_file)
         
         # Specific initialization for the rescuer
-        self.resc = resc           # reference to the rescuer agent
+        self.rescuers = rescuers           # reference to the rescuer agent
         self.rtime = self.TLIM     # remaining time to explore   
         self.horizontal = 0 # Incrementa se andar para a direita e decrementa se andar para a esquerda
         self.vertical = 0  # Incrementa se andar para baixo e decrementa se andar para cima
@@ -159,9 +159,12 @@ class Explorer(AbstractAgent):
         if not self.at_base():
             return True
         else:
-            for i, r in enumerate(self.resc):
-                self.resc[i].merge_maps(list(self.known_map), list(self.known_victims))
-            return False
+            for i, r in enumerate(self.rescuers):
+                self.rescuers[i].merge_maps(list(self.known_map), list(self.known_victims))
+                if (i == len(self.rescuers) - 1) and (self.rescuers[i].get_received_maps() == 4):
+                    self.rescuers[i].clusterize()
+
+        return False
 
     def time_to_get_back(self):
 
@@ -223,7 +226,6 @@ class Explorer(AbstractAgent):
                 if cost != None:
                     self.map_graph[discovered].append([coord, cost])
                     self.map_graph[coord].append([discovered, cost])
-            end_time = time.time()
                 
     def is_neighbour(self, coord1, coord2):
         if (coord1[0] - 1, coord1[1]) == coord2:
