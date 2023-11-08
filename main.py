@@ -8,6 +8,7 @@ import time
 from environment import Env
 from explorer import Explorer
 from rescuer import Rescuer
+from rescuer_master import RescuerMaster
 
 def main(data_folder_name):
    
@@ -26,26 +27,28 @@ def main(data_folder_name):
     resc_list = []
 
     # Instantiate agents rescuer and explorer
-    resc1 = Rescuer(env, rescuer_file, [])
+    resc1 = Rescuer(env, rescuer_file)
     resc_list.append(resc1)
-    resc2 = Rescuer(env, rescuer_file, [])
+    resc2 = Rescuer(env, rescuer_file)
     resc_list.append(resc2)
-    resc3 = Rescuer(env, rescuer_file, [])
+    resc3 = Rescuer(env, rescuer_file)
     resc_list.append(resc3)
-    resc4 = Rescuer(env, rescuer_file, resc_list.copy())
-    resc_list.append(resc4)
+    resc_master= RescuerMaster(env, rescuer_file)
+
+    exp_list = []
 
     # Explorer needs to know rescuer to send the map
-    # that's why rescuer is instatiated before
-    # lista = ['E', 'N', 'NW', 'SW', 'NE', 'SE', 'W', 'S']
-    # exp = Explorer(env, explorer_file, [resc], random.sample(lista, len(lista)))
-    # exp = Explorer(env, explorer_file, [resc], random.sample(lista, len(lista)))
-    # exp = Explorer(env, explorer_file, [resc], random.sample(lista, len(lista)))
-    # exp = Explorer(env, explorer_file, [resc], random.sample(lista, len(lista)))
-    exp = Explorer(env, explorer_file, resc_list, ['E', 'N', 'S', 'W', 'NE', 'NW', 'SW', 'SE'])
-    exp = Explorer(env, explorer_file, resc_list, ['N', 'W', 'E', 'S', 'NW', 'NE', 'SE', 'SW'])
-    exp = Explorer(env, explorer_file, resc_list, ['W', 'S', 'N', 'E', 'SW', 'SE', 'NE', 'NW'])
-    exp = Explorer(env, explorer_file, resc_list, ['S', 'E', 'W', 'N', 'SE', 'NE', 'NW', 'SW'])
+    exp1 = Explorer(env, explorer_file, resc_master, ['E', 'N', 'S', 'W', 'NE', 'NW', 'SW', 'SE'])
+    exp_list.append(exp1)
+    exp2 = Explorer(env, explorer_file, resc_master, ['N', 'W', 'E', 'S', 'NW', 'NE', 'SE', 'SW'])
+    exp_list.append(exp2)
+    exp3 = Explorer(env, explorer_file, resc_master, ['W', 'S', 'N', 'E', 'SW', 'SE', 'NE', 'NW'])
+    exp_list.append(exp3)
+    exp4 = Explorer(env, explorer_file, resc_master, ['S', 'E', 'W', 'N', 'SE', 'NE', 'NW', 'SW'])
+    exp_list.append(exp4)
+
+
+    resc_master.set_explores_and_rescuers_list(exp_list, resc_list)
 
     # Run the environment simulator
     env.run()

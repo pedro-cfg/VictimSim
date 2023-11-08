@@ -4,6 +4,9 @@ from rescue_route import RescueRoute
 import time
 import numpy
 
+POPULATION = 200
+MUTATION = 55
+
 class Genetic:
 
     graph_map = {}
@@ -56,70 +59,87 @@ class Genetic:
             return rescuer.COST_DIAG
         return None
     
-    def verify_possible_routes(self):
-        pass
+    def population_score(self):
+        sum = 0
 
-    def find_route(self, victims):
-        ini = time.time()
-        self.init_route_population(5, victims)
-        fim = time.time()
-        print(f"Init: {fim - ini}")
-        mutation_number = 10
-        victim_number = len(victims)
-        done = False
+        for individual in self.population:
+            sum += individual.get_distance()
 
-        for i in range(mutation_number):
-            ini = time.time()
-            sum = 0
+        return sum / len(self.population)
+
+    def find_route(self, victims_coords):
+        print("Generating routes for rescuer!")
+        init = time.time()
+        self.create_initial_population(victims_coords)
+
+        initial_average = self.population_score()
+        final_average = 0
+
+        for i in range(MUTATION):
+            
             new_generation = []
-            for individual in self.population:
-                sum += individual.calculate_fitness()
-            fim = time.time()
-            #print(f"For 1: {fim - ini}")
 
-            ini = time.time()
-            for individual in self.population:
-                individual.set_fitness(individual.calculate_fitness() / sum)
-            fim = time.time()
-            #print(f"For 2: {fim - ini}")
+            for j in range(POPULATION):
+                individual = self.roulette(self.population)
+                new_individual = individual.mutate()
+                new_generation.append(new_individual)
 
-            ini = time.time()
-            #self.population = sorted(self.population, key=lambda individual: individual.get_fitness())
-            for individual in self.population:
-                selected = self.roulette(self.population)
-                selected.mutate()
-                new_generation.append(selected)
-            fim = time.time()
-            print(f"For 3: {fim - ini}")
-            #print("\n")
-            self.population = new_generation
+            self.population = self.population + new_generation
+            self.population = self.select_outliers(self.population)
 
         best_individual = self.get_best_individual()
+        end = time.time()
+
+        final_average = self.population_score()
+
+        print(f"    Population 1 distance average = {initial_average}m")
+        print(f"    Population {POPULATION} distance average = {final_average}m")
+        print(f"Completed! -> {end - init}")
+        print("")
+
         return best_individual.get_movements()
 
     def get_best_individual(self):
-        best_dist = self.population[0].get_total_distance()
+
+        best_dist = self.population[0].get_distance()
         best_ind = self.population[0]
         for ind in self.population:
-            if ind.get_total_distance() < best_dist:
-                best_dist = ind.get_total_distance()
+            if ind.get_distance() < best_dist:
+                best_dist = ind.get_distance()
                 best_ind = ind
         return best_ind
+    
+    def select_outliers(self, population):
+        return sorted(population, key=lambda individual: individual.get_fitness(), reverse=True)[:POPULATION]
 
-    def init_route_population(self, number, victims):
 
-        for i in range(number):
-            individual = RescueRoute(self.rescuer)
-            individual.init_route(victims)
+    def create_initial_population(self, victims_coords):
+
+        victims_sequence = [i for i in range(len(victims_coords))]
+
+        for i in range(POPULATION):
+            random.shuffle(victims_sequence)
+            individual = RescueRoute(self.rescuer, victims_sequence.copy(), victims_coords)
             self.population.append(individual)
 
+    def normalize_fitness(self, population):
+        sum = 0
+        for individual in population:
+            sum += individual.get_fitness()
+
+        for individual in population:
+            individual.set_normalized_fitness(individual.get_fitness() / sum)
+
     def roulette(self, population):
+
+        self.normalize_fitness(population)
+
         i = 0
-        sum = population[i].get_fitness()
+        sum = population[i].get_normalized_fitness()
         r = random.uniform(0, 1)
 
         while(sum < r):
             i = i + 1
-            sum += population[i].get_fitness()
+            sum += population[i].get_normalized_fitness()
 
         return population[i]

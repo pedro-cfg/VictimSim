@@ -7,13 +7,15 @@ import random
 from abstract_agent import AbstractAgent
 from physical_agent import PhysAgent
 from abc import ABC, abstractmethod
-from kmeans import KMeans
 from genetic import Genetic
 import time
 
 ## Classe que define o Agente Rescuer com um plano fixo
 class Rescuer(AbstractAgent):
-    def __init__(self, env, config_file, rescuers):
+
+    cluster_ready = False
+
+    def __init__(self, env, config_file):
         """ 
         @param env: a reference to an instance of the environment class
         @param config_file: the absolute path to the agent's config file"""
@@ -29,54 +31,23 @@ class Rescuer(AbstractAgent):
         self.body.set_state(PhysAgent.IDLE)
         self.known_map = []
         self.known_victims = []
-        self.received_maps = 0
-        self.rescuers = rescuers
     
     def go_save_victims(self):
         """ The explorer sends the map containing the walls and
         victims' location. The rescuer becomes ACTIVE. From now,
         the deliberate method is called by the environment"""
-        self.__planner()
         self.body.set_state(PhysAgent.ACTIVE)
-
-    def merge_maps(self, path, victims):
-
-        for i, coord in enumerate(path):
-            if coord not in self.known_map:
-                self.known_map.append(coord)
-
-        self.received_maps +=1
-
-        for i, victim in enumerate(victims):
-            if victim not in self.known_victims:
-                self.known_victims.append(victim)
-
-    def liberate_rescuers(self):
-
-        self.go_save_victims()
-        
-        for rescuer in self.rescuers:
-            rescuer.go_save_victims()
-
-    def get_received_maps(self):
-        return self.received_maps
     
+    def receive_map(self, map):
+        self.known_map = map
+
+    def wake_up(self):
+        self.go_save_victims()
+
     def set_group(self, group):
         self.known_victims = group[1]
-    
-    def clusterize(self):
-        cluster = KMeans()
-        groups = cluster.execute(self.known_victims, 4)
 
-        for i, rescuer in enumerate(self.rescuers):
-            rescuer.set_group(groups[i])
-
-        self.set_group(groups[len(groups) - 1])
-
-        self.liberate_rescuers()
-
-
-    def __planner(self):
+    def _planner(self):
         """ A private method that calculates the walk actions to rescue the
         victims. Further actions may be necessary and should be added in the
         deliberata method"""
@@ -84,23 +55,9 @@ class Rescuer(AbstractAgent):
         # This is a off-line trajectory plan, each element of the list is
         # a pair dx, dy that do the agent walk in the x-axis and/or y-axis
 
-        ini = time.time()
         genetic = Genetic(self.known_map, self)
-        fim = time.time()
-        print(f"Genetic: {fim - ini}")
-
-        self.plan = genetic.find_route(self.known_victims)
-
-        # self.plan.append((0,1))
-        # self.plan.append((1,1))
-        # self.plan.append((1,0))
-        # self.plan.append((1,-1))
-        # self.plan.append((0,-1))
-        # self.plan.append((-1,0))
-        # self.plan.append((-1,-1))
-        # self.plan.append((-1,-1))
-        # self.plan.append((-1,1))
-        # self.plan.append((1,1))
+        victim_coords = [victim[0] for victim in self.known_victims]
+        self.plan = genetic.find_route(victim_coords)
 
     def deliberate(self) -> bool:
         """ This is the choice of the next action. The simulator calls this
@@ -108,6 +65,9 @@ class Rescuer(AbstractAgent):
         Must be implemented in every agent
         @return True: there's one or more actions to do
         @return False: there's no more action to do """
+        
+        if not Rescuer.cluster_ready:
+            return True
 
         # No more actions to do
         if self.plan == []:  # empty list, no more actions to do

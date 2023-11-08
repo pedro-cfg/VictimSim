@@ -9,59 +9,58 @@ class RescueRoute:
 
     graph_map = {}
 
-    def __init__(self, rescuer):
-        self.victim_sequence = []
-        self.distance = -1
-        self.victims = []
-        self.fitness = 0
+    def __init__(self, rescuer, sequence, victim_coords):
+        self.victim_sequence = sequence
+        self.victims_coords = victim_coords
+        self.distance = 0
+        self.normalized_fitness = 0
         self.rescuer = rescuer
+        self.calculate_distance()
 
-    def calculate_fitness(self):
+    def set_normalized_fitness(self, nfit):
+        self.normalized_fitness = nfit
+
+    def get_distance(self):
+        return self.distance
+
+    def get_fitness(self):
         return 1 / (1 + self.distance)
     
-    def get_fitness(self):
-        return self.fitness
+    def get_normalized_fitness(self):
+        return self.normalized_fitness
     
-    def set_fitness(self, fit):
-        self.fitness = fit
-    
-    def init_route(self, victims):
-        self.victims = victims
-        order = list(range(len(victims)))
-        random.shuffle(order)
-        self.victim_sequence = order
+    def calculate_distance(self):
+        value = 0
+        for i in range(len(self.victim_sequence) - 1) :
+            dx = self.victims_coords[self.victim_sequence[i + 1]][0] - self.victims_coords[self.victim_sequence[i]][0]
+            dy = self.victims_coords[self.victim_sequence[i + 1]][1] - self.victims_coords[self.victim_sequence[i]][1]
+            value += min(abs(dx), abs(dy)) * 1.5  # Anda o máximo que pode na diagonal
+            value += abs((abs(dx) - abs(dy))) * 1  # Anda o restante na vertical/horizontal
 
-        self.distance = self.total_distance()
+        self.distance = value
 
-    def total_distance(self):
-        
-        distance = 0
+    def mutate(self):
 
-        #result = self.astar(RescueRoute.graph_map, (0, 0), self.victims[self.victim_sequence[0]][0])
-        #distance += self.calculate_cost(result)
-        distance = self.get_estimate_dist((0, 0), self.victims[self.victim_sequence[0]][0])
+        #O rand acrescenta 0,3 sec no tempo final
+        index1 = random.randint(0, len(self.victim_sequence) - 1)
+        index2 = random.randint(0, len(self.victim_sequence) - 1)
 
-        for i in range(len(self.victim_sequence) - 1):
-            #distance += self.distance_between_victims(self.victim_sequence[i], self.victim_sequence[i + 1])
-            distance += self.get_estimate_dist(self.victims[self.victim_sequence[i]][0], self.victims[self.victim_sequence[i + 1]][0])
+        new_sequence = self.victim_sequence.copy()
 
-        #result = self.astar(RescueRoute.graph_map, self.victims[self.victim_sequence[len(self.victim_sequence) - 1]][0], (0,0))
-        #distance += self.calculate_cost(result)
-        distance += self.get_estimate_dist(self.victims[self.victim_sequence[len(self.victim_sequence) - 1]][0], (0,0))
+        aux = new_sequence[index1]
+        new_sequence[index1] = new_sequence[index2]
+        new_sequence[index2] = aux
 
-        return distance
-
-    def get_total_distance(self):
-        return self.distance
+        return RescueRoute(self.rescuer, new_sequence.copy(), self.victims_coords)
 
     def get_movements(self):
         coords = []
-        base_to_first_victim = self.astar(RescueRoute.graph_map, (0, 0), self.victims[self.victim_sequence[0]][0])
+        base_to_first_victim = self.astar(RescueRoute.graph_map, (0, 0), self.victims_coords[self.victim_sequence[0]])
         coords += base_to_first_victim
         for i in range(len(self.victim_sequence) - 1):
-            victim_to_victim = self.astar(RescueRoute.graph_map, self.victims[self.victim_sequence[i]][0], self.victims[self.victim_sequence[i + 1]][0])
+            victim_to_victim = self.astar(RescueRoute.graph_map, self.victims_coords[self.victim_sequence[i]], self.victims_coords[self.victim_sequence[i + 1]])
             coords += victim_to_victim
-        last_victim_to_base = self.astar(RescueRoute.graph_map, self.victims[self.victim_sequence[len(self.victim_sequence) - 1]][0], (0, 0))
+        last_victim_to_base = self.astar(RescueRoute.graph_map, self.victims_coords[self.victim_sequence[len(self.victim_sequence) - 1]], (0, 0))
         coords += last_victim_to_base
 
         movements = self.translate_coords_to_movements(coords)
@@ -81,22 +80,6 @@ class RescueRoute:
 
         return movements
 
-
-    def mutate(self):
-        index1 = random.randint(0, len(self.victim_sequence) - 1)
-        index2 = random.randint(0, len(self.victim_sequence) - 1)
-
-        if index1 == index2:
-            return
-
-        aux = self.victim_sequence[index1]
-        self.victim_sequence[index1] = self.victim_sequence[index2]
-        self.victim_sequence[index2] = aux
-
-        ini = time.time()
-        self.distance = self.total_distance()
-        fim = time.time()
-        #print(f"Total dist: {fim-ini}")
 
     def distance_between_victims(self, v1, v2):
 

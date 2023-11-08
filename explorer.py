@@ -14,7 +14,7 @@ from node import Node
 import time
 
 class Explorer(AbstractAgent):
-    def __init__(self, env, config_file, rescuers, path_priorities):
+    def __init__(self, env, config_file, rescuer_master, path_priorities):
         """ Construtor do agente random on-line
         @param env referencia o ambiente
         @config_file: the absolute path to the explorer's config file
@@ -24,7 +24,7 @@ class Explorer(AbstractAgent):
         super().__init__(env, config_file)
         
         # Specific initialization for the rescuer
-        self.rescuers = rescuers           # reference to the rescuer agent
+        self.rescuer_master = rescuer_master          # reference to the rescuer agent
         self.rtime = self.TLIM     # remaining time to explore   
         self.horizontal = 0 # Incrementa se andar para a direita e decrementa se andar para a esquerda
         self.vertical = 0  # Incrementa se andar para baixo e decrementa se andar para cima
@@ -36,6 +36,9 @@ class Explorer(AbstractAgent):
         self.returning_to_base = False
 
         self.map = Map(path_priorities)
+
+    def get_state(self):
+        return self.body.state
     
     def deliberate(self) -> bool:
         """ The agent chooses the next action. The simulator calls this
@@ -159,10 +162,8 @@ class Explorer(AbstractAgent):
         if not self.at_base():
             return True
         else:
-            for i, r in enumerate(self.rescuers):
-                self.rescuers[i].merge_maps(list(self.known_map), list(self.known_victims))
-                if (i == len(self.rescuers) - 1) and (self.rescuers[i].get_received_maps() == 4):
-                    self.rescuers[i].clusterize()
+            self.rescuer_master.merge_maps(list(self.known_map), list(self.known_victims))
+            self.rescuer_master.wake_up()
 
         return False
 
