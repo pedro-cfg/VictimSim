@@ -33,7 +33,7 @@ def main(data_folder_name):
     resc_list.append(resc2)
     resc3 = Rescuer(env, rescuer_file)
     resc_list.append(resc3)
-    resc_master= RescuerMaster(env, rescuer_file)
+    resc_master = RescuerMaster(env, rescuer_file)
 
     exp_list = []
 
@@ -61,6 +61,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         data_folder_name = sys.argv[1]
     else:
-        data_folder_name = os.path.join("datasets", "data_teste_sala")
+        data_folder_name = os.path.join("datasets", "data_20x20_42vic")
         
     main(data_folder_name)

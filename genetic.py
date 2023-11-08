@@ -4,8 +4,8 @@ from rescue_route import RescueRoute
 import time
 import numpy
 
-POPULATION = 200
-MUTATION = 55
+POPULATION = 10
+MUTATION = 10
 
 class Genetic:
 
@@ -37,7 +37,6 @@ class Genetic:
                 if cost is not None:
                     Genetic.graph_map[(position[0], position[1])].append([(coord[0], coord[1]), cost])
         breaking = 1
-
 
     @staticmethod
     def is_neighbour(coord1, coord2, rescuer):
