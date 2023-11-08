@@ -9,7 +9,7 @@ from physical_agent import PhysAgent
 from abc import ABC, abstractmethod
 from kmeans import KMeans
 from genetic import Genetic
-
+import time
 
 ## Classe que define o Agente Rescuer com um plano fixo
 class Rescuer(AbstractAgent):
@@ -84,9 +84,12 @@ class Rescuer(AbstractAgent):
         # This is a off-line trajectory plan, each element of the list is
         # a pair dx, dy that do the agent walk in the x-axis and/or y-axis
 
-        genetic = Genetic(self.known_map)
+        ini = time.time()
+        genetic = Genetic(self.known_map, self)
+        fim = time.time()
+        print(f"Genetic: {fim - ini}")
 
-        genetic.find_route(self.known_victims)
+        self.plan = genetic.find_route(self.known_victims)
 
         # self.plan.append((0,1))
         # self.plan.append((1,1))

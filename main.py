@@ -19,7 +19,7 @@ def main(data_folder_name):
     # Instantiate the environment
     env = Env(data_folder)
     
-    # config files for the agen5ts
+    # config files for the agents
     rescuer_file = os.path.join(data_folder, "rescuer_config.txt")
     explorer_file = os.path.join(data_folder, "explorer_config.txt")
     
@@ -28,9 +28,13 @@ def main(data_folder_name):
     # Instantiate agents rescuer and explorer
     resc1 = Rescuer(env, rescuer_file, [])
     resc_list.append(resc1)
-    resc2 = Rescuer(env, rescuer_file, resc_list.copy())
-    
+    resc2 = Rescuer(env, rescuer_file, [])
     resc_list.append(resc2)
+    resc3 = Rescuer(env, rescuer_file, [])
+    resc_list.append(resc3)
+    resc4 = Rescuer(env, rescuer_file, resc_list.copy())
+    resc_list.append(resc4)
+
     # Explorer needs to know rescuer to send the map
     # that's why rescuer is instatiated before
     # lista = ['E', 'N', 'NW', 'SW', 'NE', 'SE', 'W', 'S']
@@ -54,6 +58,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         data_folder_name = sys.argv[1]
     else:
-        data_folder_name = os.path.join("datasets", "data_20x20_42vic")
+        data_folder_name = os.path.join("datasets", "data_teste_sala")
         
     main(data_folder_name)
