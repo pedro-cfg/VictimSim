@@ -4,8 +4,8 @@ from rescue_route import RescueRoute
 import time
 import numpy
 
-POPULATION = 10
-MUTATION = 10
+POPULATION = 500
+MUTATION = 50
 
 class Genetic:
 
@@ -92,7 +92,7 @@ class Genetic:
         final_average = self.population_score()
 
         print(f"    Population 1 distance average = {initial_average}m")
-        print(f"    Population {POPULATION} distance average = {final_average}m")
+        print(f"    Population {MUTATION} distance average = {final_average}m")
         print(f"Completed! -> {end - init}")
         print("")
 

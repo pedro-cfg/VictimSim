@@ -109,13 +109,15 @@ class Env:
             print("from env: Assuming nb of victims of env_victims.txt")
             
         victims = [[var[3], var[4], var[5]] for var in self.signals]   #Cria vetor de vitimas contendo variaveis pressao, batimentos e respiração
-        out = self.fuz.defuzzyfy(victims) #Saida do fuzzy
-        
+        self.out = self.fuz.defuzzyfy(victims) #Saida do fuzzy
+
         real_gravity = []    #Vetor com grupos originais, para comparação
         for vic in self.signals:
             real_gravity.append(vic[7])
-        
-        self.fuz.measurement(out,real_gravity)  #Realiza as contas entre o vetor inferido e o original
+
+        self.signals = [[signal[0], signal[6], self.out[i]] for i, signal in enumerate(self.signals)]
+
+        self.fuz.measurement(self.out, real_gravity)  #Realiza as contas entre o vetor inferido e o original
 
         # Set up found and saved victims' lists 
         self.found = [[] for v in range(self.nb_of_victims)]

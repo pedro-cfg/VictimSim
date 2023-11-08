@@ -84,6 +84,8 @@ class KMeans():
             max_x = -9999
             min_y = 9999
             max_y = -9999
+            min_z = 9999
+            max_z = -9999
 
             for victim in victims:  
                 if victim[0][0] > max_x:
@@ -94,10 +96,15 @@ class KMeans():
                     max_y = victim[0][1]
                 if victim[0][1] < min_y:
                     min_y = victim[0][1]
+                if victim[1][1] > max_z:
+                    max_z = victim[1][1]
+                if victim[1][1] < min_z:
+                    min_z = victim[1][1]
 
             x = random.randint(min_x, max_x)
             y = random.randint(min_y, max_y)
-            centroids.append((x, y))
+            z = random.uniform(min_z, max_z)
+            centroids.append((x, y, z))
 
         return centroids
 
@@ -108,14 +115,17 @@ class KMeans():
 
         x_average = 0
         y_average = 0
+        z_average = 0
 
         for victim in group:
             x_average += victim[0][0]
             y_average += victim[0][1]
+            z_average += victim[1][1]
 
         x_average /= len(group)
         y_average /= len(group)
-        return (x_average, y_average)
+        z_average /= len(group)
+        return (x_average, y_average, z_average)
 
     def distance_to_centroid(self, victim, centroid):
-        return math.sqrt((centroid[0] - victim[0][0])**2 + (centroid[1] - victim[0][1])**2)
+        return math.sqrt((centroid[0] - victim[0][0])**2 + (centroid[1] - victim[0][1])**2 + (centroid[2] - victim[1][1])**2)

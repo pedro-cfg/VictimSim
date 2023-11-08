@@ -52,15 +52,15 @@ class RescuerMaster(Rescuer):
 
     def write_group_csv(self, group, group_number):
         # Specify the filename for your CSV file
-        filename = f'cluster{group_number}.csv'
+        filename = f'cluster{group_number}.txt'
 
         # Open the CSV file in write mode and create a CSV writer
         with open(filename, 'w', newline='') as csvfile:
-            csv_writer = csv.writer(csvfile, delimiter=';')
+            csv_writer = csv.writer(csvfile, delimiter=',')
 
             # Write the data to the CSV file
             for row in group[1]:
-                csv_writer.writerow([row[1][0], row[0][0], row[0][1], row[1][7]])
+                csv_writer.writerow([row[1][0], row[0][0], row[0][1], row[1][1], row[1][2]])
 
         print(f'Data has been written to {filename}')
 
@@ -90,16 +90,16 @@ class RescuerMaster(Rescuer):
 
     def write_saved_victims_csv(self):
         # Specify the filename for your CSV file
-        filename = 'salvas.csv'
+        filename = 'salvas.txt'
 
         # Open the CSV file in write mode and create a CSV writer
         with open(filename, 'w', newline='') as csvfile:
-            csv_writer = csv.writer(csvfile, delimiter=';')
+            csv_writer = csv.writer(csvfile, delimiter=',')
 
             # Write the data to the CSV file
             saved_victims = Rescuer.saved_victims
             for row in saved_victims:
-                csv_writer.writerow([row[1][0], row[0][0], row[0][1], row[1][7]])
+                csv_writer.writerow([row[1][0], row[0][0], row[0][1], row[1][1], row[1][2]])
 
         print(f'Data has been written to {filename}')
 
