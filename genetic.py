@@ -4,8 +4,8 @@ from rescue_route import RescueRoute
 import time
 import numpy
 
-POPULATION = 500
-MUTATION = 50
+POPULATION = 1000
+MUTATION = 70
 
 class Genetic:
 

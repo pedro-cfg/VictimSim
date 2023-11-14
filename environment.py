@@ -95,7 +95,7 @@ class Env:
                 lb = int(row[Env.IDX_SEVERITY])  # label of the injury severity
                 
                 self.signals.append([seq, sp, dp, qp, pf, rf, gr, lb])
-                self.severity.append(lb)
+                #self.severity.append(lb)
                 self.gravity.append(gr)
                 self.sum_gravity = self.sum_gravity + gr
 
@@ -115,9 +115,10 @@ class Env:
         for vic in self.signals:
             real_gravity.append(vic[7])
 
+        self.severity = [self.out[i] for i in range(len(self.out))]
         self.signals = [[signal[0], signal[6], self.out[i]] for i, signal in enumerate(self.signals)]
 
-        self.fuz.measurement(self.out, real_gravity)  #Realiza as contas entre o vetor inferido e o original
+        #self.fuz.measurement(self.out, real_gravity)  #Realiza as contas entre o vetor inferido e o original
 
         # Set up found and saved victims' lists 
         self.found = [[] for v in range(self.nb_of_victims)]

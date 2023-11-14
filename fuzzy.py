@@ -12,9 +12,9 @@ class Fuzzy:
         self.medium_dictionary = defaultdict(int)
         self.big_dictionary = defaultdict(int)
         self.wang_mendel("datasets/data_800vic/sinais_vitais_com_label.txt")  #Treina com varios arquivos
-        self.wang_mendel("datasets/data_12x12_10vic/sinais_vitais.txt")         
-        self.wang_mendel("datasets/data_20x20_42vic/sinais_vitais.txt")
-        self.wang_mendel("datasets/data_teste_sala/sinais_vitais.txt")
+        #self.wang_mendel("datasets/data_12x12_10vic/sinais_vitais.txt")         
+        #self.wang_mendel("datasets/data_20x20_42vic/sinais_vitais.txt")
+        #self.wang_mendel("datasets/data_teste_sala/sinais_vitais.txt")
         #self.teste_800vit()
   
     def small_fuzzyfy(self,max,var): #Divide cada variavel em 5 grupos - fuzzy triangular
