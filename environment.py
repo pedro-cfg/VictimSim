@@ -10,6 +10,7 @@ import time
 from abstract_agent import AbstractAgent
 from physical_agent import PhysAgent
 from fuzzy import Fuzzy
+from neural_net import neural_net
 
 
 ## Class Environment
@@ -49,6 +50,7 @@ class Env:
         self.saved   = [[]]    # positional: Physical agents that saved each victim 
         
         self.fuz = Fuzzy() #Cria objeto fuzzy
+        self.neural = neural_net();
         
         # Read the environment config file
         self.__read_config()
