@@ -1,8 +1,12 @@
 import pandas as pd
 import numpy as np
 import tensorflow as tf
+from scikeras.wrappers import KerasRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import mean_squared_error
+import sys
         
 class neural_net:
     def __init__(self):
@@ -57,36 +61,48 @@ class neural_net:
         model3.compile(optimizer='adam', loss='mean_squared_error')
 
 
+        m1 = KerasRegressor(model1, batch_size=32, epochs=100, verbose=0)
+        m2 = KerasRegressor(model2, batch_size=32, epochs=100, verbose=0)
+        m3 = KerasRegressor(model3, batch_size=32, epochs=100, verbose=0)
+
+        val_score1 = np.mean(cross_val_score(m1, X_train, T_train, cv=5))
+        val_score2 = np.mean(cross_val_score(m2, X_train, T_train, cv=5))
+        val_score3 = np.mean(cross_val_score(m3, X_train, T_train, cv=5))
+
+        max_cv_score = max (val_score1, val_score2, val_score3)
+
+        final_model = None
+
+        if max_cv_score == val_score1:
+           print("Modelo 1 escolhido")
+           final_model = m1
+        
+        if max_cv_score == val_score2:
+            print("Modelo 1 escolhido")
+            final_model = m2
+
+        if max_cv_score == val_score3:
+            print("Modelo 3 escolhido")
+            final_model = m3
+
+        final_model.fit(X_test, T_test, verbose = 1)
+        print("Modelo final treinado")
+        # P_test = model.predict(TESTE_CEGO)
+        # mean_squared_error(P_test, EXPECTED TESTE CEGO)
+
         # Treinando as redes
-        model1.fit(X_train, T_train, epochs=100, batch_size=32, validation_data=(X_test, T_test), verbose=2)
-        model2.fit(X_train, T_train, epochs=100, batch_size=32, validation_data=(X_test, T_test), verbose=2)
-        model3.fit(X_train, T_train, epochs=100, batch_size=32, validation_data=(X_test, T_test), verbose=2)
+        # model1.fit(X_train, T_train, epochs=100, batch_size=32, validation_data=(X_test, T_test), verbose=2)
+        # model2.fit(X_train, T_train, epochs=100, batch_size=32, validation_data=(X_test, T_test), verbose=2)
+        # model3.fit(X_train, T_train, epochs=100, batch_size=32, validation_data=(X_test, T_test), verbose=2)
         
         # Avaliando os modelos
-        loss1 = model1.evaluate(X_test, T_test, verbose=0)
-        print(f'Mean Squared Error on Test Data (Model 1): {loss1}')
+        # loss1 = model1.evaluate(X_test, T_test, verbose=0)
+        # print(f'Mean Squared Error on Test Data (Model 1): {loss1}')
         
-        loss2 = model2.evaluate(X_test, T_test, verbose=0)
-        print(f'Mean Squared Error on Test Data (Model 1): {loss2}')
+        # loss2 = model2.evaluate(X_test, T_test, verbose=0)
+        # print(f'Mean Squared Error on Test Data (Model 2): {loss2}')
         
-        loss3 = model3.evaluate(X_test, T_test, verbose=0)
-        print(f'Mean Squared Error on Test Data (Model 1): {loss3}')
-
-        # Fazendo previsões
-        sample_data = np.array([[8.733333,167.434127,8.423106], [4.225599,70.001165,15.606912], [3.953607,37.942081,18.586825]]) #gravidade 13,22 73.37 43.76
-        sample_data = scaler.transform(sample_data)
+        # loss3 = model3.evaluate(X_test, T_test, verbose=0)
+        # print(f'Mean Squared Error on Test Data (Model 3): {loss3}')
         
-        predicted_gravity1 = model1.predict(sample_data)
-        print(f'(Model 1) Predicted Gravity 1: {predicted_gravity1[0]} / 13,22')
-        print(f'(Model 1) Predicted Gravity 2: {predicted_gravity1[1]} / 73,37')
-        print(f'(Model 1) Predicted Gravity 3: {predicted_gravity1[2]} / 43,76')
-        
-        predicted_gravity2 = model2.predict(sample_data)
-        print(f'(Model 2) Predicted Gravity 1: {predicted_gravity2[0]} / 13,22')
-        print(f'(Model 2) Predicted Gravity 2: {predicted_gravity2[1]} / 73,37')
-        print(f'(Model 2) Predicted Gravity 3: {predicted_gravity2[2]} / 43,76')
-        
-        predicted_gravity3 = model3.predict(sample_data)
-        print(f'(Model 3) Predicted Gravity 1: {predicted_gravity3[0]} / 13,22')
-        print(f'(Model 3) Predicted Gravity 2: {predicted_gravity3[1]} / 73,37')
-        print(f'(Model 3) Predicted Gravity 3: {predicted_gravity3[2]} / 43,76')
+        sys.exit()
